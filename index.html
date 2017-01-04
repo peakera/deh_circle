@@ -23,10 +23,8 @@
 			left: 40
 		}, width = 960 - margin.left - margin.right,
 			height = 500 - margin.top - margin.bottom;
-
 		var r = [];
 		var i = 0;
-
 		var y = d3.scale.ordinal().domain(d3.range(1)).rangePoints([0, height]);
 
 
@@ -34,17 +32,11 @@
 			data.forEach(function(d){
 				d.chapter = +d.chapter;
 				d.count = +d.count; 	});
-
-
-			//console.log(data[1]);
 			
 		var radius =  data.map(function(d) {return (d.count);});
 		var chapter = data.map(function(d){ return (d.chapter); });
-
 		var maxData = d3.max(radius, function(d) {return (d);});
 	
-
-
 		var svg = d3.select("body")
 			.append("svg")
 			.attr("viewBox", "0 0 960 500")
@@ -94,8 +86,7 @@
 
 		function pulse() {
 			var circle = svg.select("circle");
-			var label = svg.select("text");
-			
+			var label = svg.select("text");		
 
 			(function repeat() {
 				for(var i=0; i<58; i++) {
@@ -112,6 +103,7 @@
 						.ease('sine')
 						.each("end", repeat);
 
+					//Creates a label for the chapter number and tag frequency within each chapter that appears at the midpoint of the circle's pulse.
 					label = label.transition()
 						.duration(1500)
 						.remove()
@@ -126,10 +118,5 @@
 				};
 			})();
 		}
-
-
-
-			});
-
-		
+	});		
 	</script>
