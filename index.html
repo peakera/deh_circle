@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+	svg {
+		background-color: #3b3b3c;
+	}
+	circle {
+		fill: #93C47d;
+	}
+
+</style>
+
+<body>
+	<script src="http://d3js.org/d3.v3.min.js"></script>
+	<script src='https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.13.1/lodash.js'></script>
+	<script>
+		var margin = {
+			top: 40,
+			right: 40,
+			bottom: 40,
+			left: 40
+		}, width = 960 - margin.left - margin.right,
+			height = 500 - margin.top - margin.bottom;
+
+		var r = [];
+		var i = 0;
+
+		var y = d3.scale.ordinal().domain(d3.range(1)).rangePoints([0, height]);
+
+
+		d3.csv('flora_by_chap.csv', function(error, data){
+			data.forEach(function(d){
+				d.chapter = +d.chapter;
+				d.count = +d.count; 	});
+
+
+			//console.log(data[1]);
+			
+		var radius =  data.map(function(d) {return (d.count);});
+		var chapter = data.map(function(d){ return (d.chapter); });
+
+		var maxData = d3.max(radius, function(d) {return (d);});
+	
+
+
+		var svg = d3.select("body")
+			.append("svg")
+			.attr("viewBox", "0 0 960 500")
+    		.attr("preserveAspectRatio", "xMinYMin meet")
+			.attr("width", width + margin.left + margin.right)
+			.attr("height", height + margin.top + margin.bottom)
+			.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+		
+		var text = svg.selectAll("text")
+			.data(data)
+			.enter()
+			.append("text");
+
+		var label = text
+			.attr("class", "label")
+			.attr("x", 50)
+			.attr("y", 380)
+			.attr("font-size", "1.25rem")
+			.attr("fill", "#989898");
+
+		svg.selectAll("circle")
+		 	.data(y.domain())
+		 	.enter()
+		 	.append("circle")
+			.attr("r", radius[0]*5)
+		 	.attr("cx", width / 2)
+		 	.attr("cy", (height-50)/2)
+		 	.each(pulse);
+
+		var slider = svg.append("rect")
+			.attr('x', 50)
+			.attr('y', 400)
+			.attr('width', width - 100)
+			.attr("height", 5)
+			.attr('fill', '#989898')
+
+		var title = svg.append("text")
+			.attr('class', 'title')
+			.attr('x', 50)
+			.attr('y', 440)
+			.attr('width', width-100)
+			.attr('height', 15)
+			.text("Tess of the d'Urbervilles")
+			.attr("font-size", "1.75rem")
+			.attr("fill", "#989898")
+			.attr('font-style', 'italic');
+
+		function pulse() {
+			var circle = svg.select("circle");
+			var label = svg.select("text");
+			
+
+			(function repeat() {
+				for(var i=0; i<58; i++) {
+
+					r = radius[i]
+
+
+					circle = circle.transition()
+						.duration(1000)
+						.attr("r", r*5)
+						.transition()
+						.duration(1000)
+						.attr("r", r*5)
+						.ease('sine')
+						.each("end", repeat);
+
+					label = label.transition()
+						.duration(1500)
+						.remove()
+						.text(function(d) {return "Chapter : " + chapter[i] + "," + "\xa0\xa0\xa0\xa0" + "Flora Tags : " + radius[i]; })
+						.transition()
+						.duration(500)
+						.remove(0)
+						.text(function(d) {return "Chapter : " + chapter[i+1] + "," + "\xa0\xa0\xa0\xa0" + "Flora Tags : " + radius[i+1]; })
+						.ease('sine')
+						.each('end', repeat);
+
+				};
+			})();
+		}
+
+
+
+			});
+
+		
+	</script>
